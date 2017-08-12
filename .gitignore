@@ -1,1 +1,4 @@
 *.swp
+*.pyc
+.eggs/*
+netcdfGeo.egg-info/*
