@@ -1,4 +1,5 @@
 import numpy as np
+from pyproj import Proj, transform
 
 def extract_from_mask(array, mask, fun='mean', sp_axes=(1,2)):
     """Extract and spatially aggregate data from a 3D array using a 2D mask
@@ -47,3 +48,33 @@ def extract_from_mask(array, mask, fun='mean', sp_axes=(1,2)):
         raise ValueError('fun= must be one of mean, median, min, max or sum')
     return out
 
+
+def feature_transform(feature, crs_out, crs_in={'init': 'epsg:4326'}):
+    """Reproject a dictionary representation of a feature in WGS84 to a desired projection
+
+    Args:
+        feature (dict): A dictionary representation of the feature (geojson like).
+            coordinates must be in geographical coordinates, as per the geojson
+            specifications. Supports feature types Point and Polygon
+        crs (dict): A dictionary of projection parameters, or CRS object (see rasterio.crs module)
+
+    Return:
+        Dictionary representation of the input feature, projected to the desired CRS
+    """
+    p_in = Proj(crs_in)
+    p_out = Proj(crs_out)
+    feature_out = feature.copy()
+    new_coords = []
+    if feature['geometry']['type'] == 'Polygon':
+        # Probably also work for multypolygons
+        for ring in feature['geometry']['coordinates']:
+            x2, y2 = transform(p_in, p_out, *zip(*ring))
+            new_coords.append(zip(x2, y2))
+        feature_out['geometry']['coordinates'] = new_coords
+    elif feature['geometry']['type'] == 'Point':
+        # Probably doesn't work for multipoints
+        new_coords = transform(p_in, p_out, *feature['geometry']['coordinates'])
+        feature_out['geometry']['coordinates'] = new_coords
+    else:
+        raise ValueError('Unsuported feature type')
+    return feature_out
