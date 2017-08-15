@@ -20,6 +20,7 @@ def extract_from_mask(array, mask, fun='mean', sp_axes=(1,2)):
             slice.
 
     Example:
+        >>> from netcdfGeo.extract import extract_from_mask
         >>> import numpy as np
 
         >>> # 3D array with 23 time slices
@@ -56,12 +57,30 @@ def feature_transform(feature, crs_out, crs_in={'init': 'epsg:4326'}):
 
     Args:
         feature (dict): A dictionary representation of the feature (geojson like).
-            coordinates must be in geographical coordinates, as per the geojson
-            specifications. Supports feature types Point and Polygon
-        crs (dict): A dictionary of projection parameters, or CRS object (see rasterio.crs module)
+            Unless a crs_in argument is specified, feature coordinates are assumed to
+            be in geographical coordinates (epsg:4326). Supports feature types Point and Polygon
+        crs_out (dict): A dictionary of projection parameters, or CRS object
+            (see rasterio.crs module) defining the desired returned feature coordinate
+            reference system.
+        crs_in (dict): A dictionary of projection parameters or CRS object defining
+            the coordinate reference system of the input feature.
 
     Return:
         Dictionary representation of the input feature, projected to the desired CRS
+
+    Example:
+        >>> from netcdfGeo.extract import feature_transform
+
+        >>> feature = {'geometry': {'coordinates': [[[-89.906, 19.324],
+        >>>                                          [-89.837, 19.03],
+        >>>                                          [-89.343, 19.324],
+        >>>                                          [-89.906, 19.324]]],
+        >>>                         'type': 'Polygon'},
+        >>>            'properties': {},
+        >>>            'type': 'Feature'}
+
+        >>> feature_transform(feature, {'proj': 'laea', 'lat_0': 19.2, 'lon_0': -89.5})
+
     """
     p_in = Proj(crs_in)
     p_out = Proj(crs_out)

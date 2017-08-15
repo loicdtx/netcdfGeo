@@ -77,6 +77,7 @@ class TestExtractUtils(unittest.TestCase):
         # Compare hole
         self.assertTrue(np.allclose(feature_polygon['geometry']['coordinates'][1],
                                     feature_ll['geometry']['coordinates'][1]))
+        # TODO: test for other feature types (at least Point)
 
 if __name__ == '__main__':
     unittest.main()

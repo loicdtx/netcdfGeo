@@ -1,4 +1,6 @@
 *.swp
 *.pyc
+*.swo
 .eggs/*
 netcdfGeo.egg-info/*
+sandbox/*
