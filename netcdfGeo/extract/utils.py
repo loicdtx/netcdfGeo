@@ -1,6 +1,8 @@
 import numpy as np
 from pyproj import Proj, transform
 
+import copy
+
 def extract_from_mask(array, mask, fun='mean', sp_axes=(1,2)):
     """Extract and spatially aggregate data from a 3D array using a 2D mask
 
@@ -63,7 +65,7 @@ def feature_transform(feature, crs_out, crs_in={'init': 'epsg:4326'}):
     """
     p_in = Proj(crs_in)
     p_out = Proj(crs_out)
-    feature_out = feature.copy()
+    feature_out = copy.deepcopy(feature)
     new_coords = []
     if feature['geometry']['type'] == 'Polygon':
         # Probably also work for multypolygons
